@@ -11,9 +11,9 @@ This project provides an uptime‑monitoring solution built with Flask, Promethe
 - [Observability](#observability)  
 - [Alerts](#alerts)  
 - [Automation & SRE](#automation--sre)  
-- [Advanced Options](#advanced-options)
-- [License](#license)  
-- [Contributing](#contributing)
+- [Advanced Options](#advanced-options)  
+- [License](LICENSE.md)  
+- [Contributing](CONTRIBUTING.md)
 
 ---
 
@@ -142,3 +142,14 @@ You’re free to swap components as you wish:
 * **CI/CD**: GitHub Actions, Jenkins, GitLab CI, ArgoCD.
 
 ---
+
+## Notes
+
+- This repository is part of a practical training series developed for the SRE Academy.
+- It is optimized for environments like Minikube but can be adapted to other Kubernetes setups.
+- Contributions and improvements are welcome. If you encounter issues or have suggestions, please open a pull request or GitHub issue.
+
+Happy learning and implementing SRE best practices!
+
+![Kubernetes](https://img.shields.io/badge/Platform-Kubernetes-informational)
+
