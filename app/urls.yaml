@@ -1,0 +1,8 @@
+urls:
+  - https://www.google.com
+  - https://www.ibm.com
+  - https://www.invalidurl.tld
+  - http://10.255.255.1
+  - https://www.example.com
+  - https://www.gthub.com
+  

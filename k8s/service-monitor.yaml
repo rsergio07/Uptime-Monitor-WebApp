@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: uptime-servicemonitor
+  labels:
+    release: prometheus  # <- debe coincidir con el nombre del Helm release
+spec:
+  selector:
+    matchLabels:
+      app: uptime-monitor
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 10s
+  namespaceSelector:
+    matchNames:
+      - default

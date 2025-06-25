@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: uptime-alert-rules
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+  - name: uptime-monitor.rules
+    rules:
+    - alert: UptimeMonitorURLDown
+      expr: increase(uptime_check_failure_total[1m]) > 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "URL caída detectada"
+        description: "Se detectó al menos una URL caída en los últimos 60 segundos."
