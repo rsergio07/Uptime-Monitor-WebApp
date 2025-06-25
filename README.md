@@ -1,163 +1,138 @@
-# Uptime Monitor Web App (Mini StatusPage)
+# Uptime Monitor Web App (Mini Status Page)
 
-Este proyecto implementa una solución de monitoreo de disponibilidad (Uptime Monitoring) construida con tecnologías modernas como Prometheus, Grafana y Kubernetes. Su objetivo es exponer visualmente el estado de una serie de URLs y generar alertas en caso de fallos.
+This project provides an uptime‑monitoring solution built with Flask, Prometheus, Grafana, and Kubernetes. It periodically checks configured URLs, exposes Prometheus‑style metrics, visualizes status in Grafana, and triggers alerts when failures occur.
 
----
+## Table of Contents
 
-## Tabla de Contenidos
-
-- [Arquitectura](#arquitectura)
-- [Requisitos](#requisitos)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Despliegue Local con Minikube](#despliegue-local-con-minikube)
-- [Observabilidad](#observabilidad)
-- [Alertas](#alertas)
-- [Automatización y SRE](#automatización-y-sre)
-- [Extensiones y Opciones Avanzadas](#extensiones-y-opciones-avanzadas)
+- [Architecture](#architecture)  
+- [Requirements](#requirements)  
+- [Project Structure](#project-structure)  
+- [Local Deployment (Minikube)](#local-deployment-minikube)  
+- [Observability](#observability)  
+- [Alerts](#alerts)  
+- [Automation & SRE](#automation--sre)  
+- [Advanced Options](#advanced-options)  
 
 ---
 
-## Arquitectura
+## Architecture
 
-El sistema consta de los siguientes componentes:
-
-- **Aplicación Python (Flask)**: Realiza pruebas HTTP periódicas a URLs definidas y expone métricas en `/metrics`.
-- **Prometheus**: Scrapea las métricas de la app cada 10 segundos.
-- **Grafana**: Muestra un dashboard de estado con visualización de tiempos de respuesta y errores.
-- **Alertmanager**: Dispara alertas cuando una URL falla, con opción de integración a Slack.
-- **Kubernetes**: Orquesta el despliegue usando manifiestos y monitoreo personalizado.
+- **Flask App**: periodically checks a list of URLs defined in `urls.yaml`, exposes `/status` and `/metrics`.
+- **Prometheus**: scrapes `/metrics` every 10 s via a ServiceMonitor.
+- **Grafana**: visualizes metrics and latency.
+- **Alertmanager**: alerts on failed URL checks; e.g. integration with Slack.
+- **Kubernetes**: orchestrates deployment via `deployment.yaml`, `service.yaml`, etc.
 
 ---
 
-## Requisitos
+## Requirements
 
-- Docker o Podman
-- Minikube (o un cluster Kubernetes)
-- kubectl
-- Helm
-- Python 3.9+
-- Prometheus & Grafana
+- Podman or Docker  
+- Minikube (or any Kubernetes cluster)  
+- kubectl  
+- Helm  
+- Python 3.9+  
+- Prometheus + Grafana via Helm chart  
 
 ---
 
-## Estructura del Proyecto
+## Project Structure
 
-```bash
+```
+
 .
-├── .github/workflows/deploy.yaml          # Pipeline CI/CD con GitHub Actions
-├── app/                                   # Aplicación Flask que expone /status y /metrics
+├── .github/workflows/deploy.yaml
+├── app/
 │   ├── main.py
 │   ├── requirements.txt
 │   └── urls.yaml
-├── Dockerfile                             # Imagen para la aplicación Flask
-├── k8s/                                   # Manifiestos Kubernetes
+├── Dockerfile
+├── k8s/
 │   ├── deployment.yaml
 │   ├── service.yaml
 │   ├── service-monitor.yaml
 │   └── uptime-alert-rules.yaml
-├── monitoring/grafana-dashboards/         # Dashboard JSON personalizado
-│   └── uptime-dashboard.json
-├── scripts/send_slack_alert.py            # Script para integración manual con Slack
-└── uptime-monitor.tar                     # Imagen empaquetada para importar en Minikube
+├── monitoring/
+│   └── grafana-dashboards/
+│       └── uptime-dashboard.json
+├── scripts/
+│   └── send\_slack\_alert.py
+├── README.md
+├── CONTRIBUTING.md
+└── LICENSE
+
 ````
 
 ---
 
-## Despliegue Local con Minikube
+## Local Deployment (Minikube)
 
-1. Iniciar Minikube:
-
+1. Start Minikube:
    ```bash
    minikube start
-   ```
+````
 
-2. Importar imagen:
+2. Load container image:
 
    ```bash
    minikube cp uptime-monitor.tar /tmp/images/
    minikube ssh
-   docker load -i /tmp/images/uptime-monitor.tar
-   docker tag localhost/uptime-monitor:local uptime-monitor:local
-   exit
+     docker load -i /tmp/images/uptime-monitor.tar
+     docker tag localhost/uptime-monitor:local uptime-monitor:local
+     exit
    ```
-
-3. Aplicar manifiestos:
+3. Apply Kubernetes manifests:
 
    ```bash
    kubectl apply -f k8s/
    ```
-
-4. Exponer el servicio:
+4. Port‑forward the service:
 
    ```bash
    kubectl port-forward svc/uptime-service 8088:80
    ```
+5. Access:
 
-5. Acceder:
-
-   * Aplicación: [http://localhost:8088/status](http://localhost:8088/status)
-   * Métricas Prometheus: [http://localhost:8088/metrics](http://localhost:8088/metrics)
-
----
-
-## Observabilidad
-
-* Dashboard Grafana: importá `monitoring/grafana-dashboards/uptime-dashboard.json`.
-* Datos visualizados:
-
-  * Latencia por URL
-  * Estado actual (UP/DOWN)
-  * Historial de errores
+   * App JSON: `http://localhost:8088/status`
+   * Prometheus metrics: `http://localhost:8088/metrics`
 
 ---
 
-## Alertas
+## Observability
 
-* Reglas Prometheus:
+* Import `monitoring/grafana-dashboards/uptime-dashboard.json` into Grafana.
+* Visualizes:
 
-  * Alertas si `uptime_check_failure_total` aumenta.
-  * Archivo: `k8s/uptime-alert-rules.yaml`
-
-* Alertmanager:
-
-  * Integración vía webhook o Slack.
-  * Ejemplo en `scripts/send_slack_alert.py`.
+  * URL latencies
+  * Failure counters
+  * Success rates
 
 ---
 
-## Automatización y SRE
+## Alerts
 
-* GitHub Actions:
+* Defined in `k8s/uptime-alert-rules.yaml`:
 
-  * Pipeline de despliegue definido en `.github/workflows/deploy.yaml`.
-
-* Terraform:
-
-  * Opcional para desplegar en AWS con `terraform/`.
+  * Trigger: `increase(uptime_check_failure_total[1m]) > 0`.
+* Alertmanager configuration (e.g. Slack webhook) can be added via Kubernetes Secret.
 
 ---
 
-## Extensiones y Opciones Avanzadas
+## Automation & SRE
 
-Este proyecto permite total libertad tecnológica. Algunas ideas:
-
-* **Infraestructura**:
-
-  * Usar Minikube, Kind, K3s o un cluster cloud (EKS, AKS, GKE).
-* **CI/CD**:
-
-  * GitHub Actions, Jenkins, GitLab CI, ArgoCD.
-* **Monitoreo**:
-
-  * Alternativas: Zabbix, Datadog, Uptime Kuma.
-* **Alertas**:
-
-  * Slack, Microsoft Teams, PagerDuty.
+* GitHub Actions workflow defined in `.github/workflows/deploy.yaml`.
+* Optional Terraform under `terraform/` to provision AWS/EKS cluster.
 
 ---
 
-## Créditos
+## Advanced Options
 
-Desarrollado para fines educativos dentro de un entorno formativo de SRE.
+You’re free to swap components as you wish:
+
+* **Kubernetes environment**: Minikube, Kind, GKE, EKS, AKS, IBM Cloud.
+* **App tech**: Flask, FastAPI, Node.js, Go, Ruby.
+* **IaC**: Terraform, Pulumi, Ansible.
+* **Alert endpoints**: Slack, Email, Discord, PagerDuty.
+* **CI/CD**: GitHub Actions, Jenkins, GitLab CI, ArgoCD.
 
 ---
