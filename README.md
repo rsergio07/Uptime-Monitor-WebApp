@@ -151,5 +151,5 @@ You’re free to swap components as you wish:
 
 Happy learning and implementing SRE best practices!
 
+![Observability](https://img.shields.io/badge/Observability-Grafana%20%7C%20Prometheus-orange)
 ![Kubernetes](https://img.shields.io/badge/Platform-Kubernetes-informational)
-
