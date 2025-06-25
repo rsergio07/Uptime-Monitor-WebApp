@@ -67,12 +67,13 @@ This project provides an uptime‑monitoring solution built with Flask, Promethe
 
 ## Local Deployment (Minikube)
 
-1. Start Minikube:
+1. **Start Minikube**:
+
    ```bash
    minikube start
-````
+   ```
 
-2. Load container image:
+2. **Load container image**:
 
    ```bash
    minikube cp uptime-monitor.tar /tmp/images/
@@ -81,17 +82,20 @@ This project provides an uptime‑monitoring solution built with Flask, Promethe
      docker tag localhost/uptime-monitor:local uptime-monitor:local
      exit
    ```
-3. Apply Kubernetes manifests:
+
+3. **Apply Kubernetes manifests**:
 
    ```bash
    kubectl apply -f k8s/
    ```
-4. Port‑forward the service:
+
+4. **Port‑forward the service**:
 
    ```bash
    kubectl port-forward svc/uptime-service 8088:80
    ```
-5. Access:
+
+5. **Access**:
 
    * App JSON: `http://localhost:8088/status`
    * Prometheus metrics: `http://localhost:8088/metrics`
@@ -113,8 +117,8 @@ This project provides an uptime‑monitoring solution built with Flask, Promethe
 
 * Defined in `k8s/uptime-alert-rules.yaml`:
 
-  * Trigger: `increase(uptime_check_failure_total[1m]) > 0`.
-* Alertmanager configuration (e.g. Slack webhook) can be added via Kubernetes Secret.
+  * Trigger: `increase(uptime_check_failure_total[1m]) > 0`
+* Alertmanager configuration (e.g., Slack webhook) can be added via Kubernetes Secret.
 
 ---
 
