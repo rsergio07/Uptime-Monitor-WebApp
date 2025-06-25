@@ -11,7 +11,9 @@ This project provides an uptime‑monitoring solution built with Flask, Promethe
 - [Observability](#observability)  
 - [Alerts](#alerts)  
 - [Automation & SRE](#automation--sre)  
-- [Advanced Options](#advanced-options)  
+- [Advanced Options](#advanced-options)
+- [License](#license)  
+- [Contributing](#contributing)
 
 ---
 
