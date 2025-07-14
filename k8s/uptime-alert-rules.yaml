@@ -15,5 +15,23 @@ spec:
       labels:
         severity: warning
       annotations:
-        summary: "URL caída detectada"
-        description: "Se detectó al menos una URL caída en los últimos 60 segundos."
+        summary: "URL Down Detected"
+        description: "One or more URLs have failed checks in the last 60 seconds."
+
+    - alert: UptimeMonitorHighLatency
+      expr: histogram_quantile(0.95, rate(uptime_check_duration_seconds_bucket[1m])) > 0.8
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High Latency Detected"
+        description: "The 95th percentile latency for URL checks exceeded 0.8 seconds in the last 60 seconds."
+
+    - alert: UptimeMonitorNoData
+      expr: absent(uptime_check_success_total)
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "No Uptime Data"
+        description: "No successful check metrics received in the last 2 minutes. The uptime monitor may not be running."
