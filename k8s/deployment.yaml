@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: uptime-monitor
-        image: uptime-monitor:local
-        imagePullPolicy: IfNotPresent
+        image: uptime-monitor:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 5000
         resources:
